@@ -68,10 +68,10 @@ html, body, [class*="css"] {
     color: var(--ink-primary) !important;
 }
 
-/* Streamlit Chrome Suppression */
+/* Streamlit Chrome Suppression - Fixed for Mobile Visibility */
 #MainMenu { visibility: hidden !important; display: none !important; }
 footer { visibility: hidden !important; display: none !important; }
-header[data-testid="stHeader"] { background: transparent !important; }
+header[data-testid="stHeader"] { background: var(--paper-bg) !important; z-index: 99999 !important; }
 div[data-testid="stToolbar"] { display: none !important; }
 div[data-testid="stDecoration"] { display: none !important; }
 div[data-testid="stStatusWidget"] { display: none !important; }
