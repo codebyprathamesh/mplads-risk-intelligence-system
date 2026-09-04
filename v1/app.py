@@ -235,24 +235,7 @@ div[data-testid="stDataFrame"] th {
     color: var(--ink-primary);
 }
 
-/* Sidebar: force the panel open/visible; simple clickable navigation */
-section[data-testid="stSidebar"],
-[data-testid="stSidebar"] {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    width: 300px !important;
-    min-width: 300px !important;
-    max-width: 300px !important;
-    transform: translateX(0) !important;
-}
-
-section[data-testid="stSidebar"] > div:first-child,
-[data-testid="stSidebar"] > div:first-child {
-    width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
-}
+/* Sidebar: quiet, simple clickable navigation — no radio circles */
 section[data-testid="stSidebar"] .sidebar-nav-label {
     font-family: 'IBM Plex Mono', monospace !important;
     font-size: 13px !important;
@@ -387,14 +370,14 @@ section[data-testid="stSidebar"] .sidebar-nav-active > button {
     box-sizing: border-box;
 }
 .dashboard-card:hover { border-color: #C8C4BA; }
-.dashboard-card.tone-neutral { border-left: 1px solid var(--hairline); }
-.dashboard-card.tone-neutral .dashboard-card-value { color: var(--ink-primary); }
-.dashboard-card.tone-critical { border-left: 4px solid var(--risk-critical); }
-.dashboard-card.tone-critical .dashboard-card-value { color: var(--risk-critical); }
-.dashboard-card.tone-medium { border-left: 4px solid var(--risk-medium); }
-.dashboard-card.tone-medium .dashboard-card-value { color: var(--risk-medium); }
-.dashboard-card.tone-high { border-left: 4px solid var(--risk-high); }
-.dashboard-card.tone-high .dashboard-card-value { color: var(--risk-high); }
+.dashboard-card.tone-neutral,
+.dashboard-card.tone-critical,
+.dashboard-card.tone-high,
+.dashboard-card.tone-medium { border-left: 1px solid var(--hairline); }
+.dashboard-card.tone-neutral .dashboard-card-value,
+.dashboard-card.tone-critical .dashboard-card-value,
+.dashboard-card.tone-high .dashboard-card-value,
+.dashboard-card.tone-medium .dashboard-card-value { color: var(--ink-primary); }
 .dashboard-card-kicker {
     font-family: 'Inter', sans-serif;
     font-size: 11px;
