@@ -43,17 +43,15 @@ st.markdown(
     --hairline: #DDDAD2;
     --hairline-light: #EBE8E1;
     --ink-primary: #1A1A1A;
-    --ink-secondary: #4A4F58; /* High-contrast readable dark gray */
-    --ink-muted: #4A4F58;     /* Unified readable secondary gray floor */
+    --ink-secondary: #4A4F58;
+    --ink-muted: #4A4F58;
     
-    /* Semantic Risk Scale (The ONLY accents in the entire system for risk tiers) */
     --risk-none: #6B7280;
     --risk-low: #4B7A5E;
     --risk-medium: #9C6B2E;
     --risk-high: #B0522D;
     --risk-critical: #8B2E22;
 
-    /* Non-Risk Categorical Accent Family */
     --accent-teal: #2B6B6B;
     --accent-teal-light: #6B9C9C;
 }
@@ -70,15 +68,6 @@ html, body, [class*="css"] {
     color: var(--ink-primary) !important;
 }
 
-/* Streamlit Chrome Suppression */
-#MainMenu { visibility: hidden !important; display: none !important; }
-footer { visibility: hidden !important; display: none !important; }
-header[data-testid="stHeader"] { background: transparent !important; }
-div[data-testid="stToolbar"] { display: none !important; }
-div[data-testid="stDecoration"] { display: none !important; }
-div[data-testid="stStatusWidget"] { display: none !important; }
-.stDeployButton { display: none !important; }
-
 /* Main Container Layout */
 .block-container {
     padding-top: 2.2rem !important;
@@ -86,7 +75,7 @@ div[data-testid="stStatusWidget"] { display: none !important; }
     max-width: 1480px !important;
 }
 
-/* Headings: Source Serif 4 (Official Gazette / Register Heading) */
+/* Headings */
 h1, h2, h3, h4, .serif-title, .section-head {
     font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif !important;
     font-weight: 600 !important;
@@ -114,7 +103,7 @@ h1, h2, h3, h4, .serif-title, .section-head {
     word-break: normal !important;
 }
 
-/* Monospace Authority: Numbers, IDs, Amounts, Dates & Traceable Codes */
+/* Monospace Authority */
 .mono, .mono-val, .ledger-code,
 [data-testid="stMetricValue"],
 div[data-testid="stDataFrame"] table,
@@ -695,11 +684,9 @@ GITHUB_DATA_URL = (
     "main/data/MPLAD_cleaned_v2.csv"
 )
 
+# Cached robust loader preventing UploadedFile hash errors
 @st.cache_data(show_spinner=False)
-def load_data(uploaded_file=None):
-    if uploaded_file is not None:
-        return pd.read_csv(uploaded_file, low_memory=False), "Uploaded File"
-
+def _load_default_data():
     for path in DATA_PATHS:
         try:
             if path.exists() and path.is_file():
@@ -719,8 +706,12 @@ def load_data(uploaded_file=None):
             return df, "GitHub Repository Dataset"
     except Exception:
         pass
-
     return None, None
+
+def load_data(uploaded_file=None):
+    if uploaded_file is not None:
+        return pd.read_csv(uploaded_file, low_memory=False), "Uploaded File"
+    return _load_default_data()
 
 def find_col(df, candidates):
     for name in candidates:
