@@ -270,6 +270,13 @@ section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] 
 section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label > div:first-of-type {
     display: none !important;
 }
+section[data-testid="stSidebar"] [data-testid="stRadio"] input[type="radio"] {
+    display: none !important;
+    visibility: hidden !important;
+}
+section[data-testid="stSidebar"] [data-testid="stRadio"] label > div:first-child {
+    display: none !important;
+}
 
 section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label > div:last-of-type {
     display: inline-block !important;
@@ -392,14 +399,14 @@ section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] 
     box-sizing: border-box;
 }
 .dashboard-card:hover { border-color: #C8C4BA; }
-.dashboard-card.tone-neutral { border-left: 4px solid var(--accent-teal-light); }
-.dashboard-card.tone-neutral .dashboard-card-value { color: var(--accent-teal); }
-.dashboard-card.tone-critical { border-left: 4px solid var(--risk-critical); }
-.dashboard-card.tone-critical .dashboard-card-value { color: var(--risk-critical); }
-.dashboard-card.tone-high { border-left: 4px solid var(--risk-high); }
-.dashboard-card.tone-high .dashboard-card-value { color: var(--risk-high); }
-.dashboard-card.tone-medium { border-left: 4px solid var(--risk-medium); }
-.dashboard-card.tone-medium .dashboard-card-value { color: var(--risk-medium); }
+.dashboard-card.tone-neutral,
+.dashboard-card.tone-critical,
+.dashboard-card.tone-high,
+.dashboard-card.tone-medium { border-left: 1px solid var(--hairline); }
+.dashboard-card.tone-neutral .dashboard-card-value,
+.dashboard-card.tone-critical .dashboard-card-value,
+.dashboard-card.tone-high .dashboard-card-value,
+.dashboard-card.tone-medium .dashboard-card-value { color: var(--ink-primary); }
 .dashboard-card-kicker {
     font-family: 'Inter', sans-serif;
     font-size: 11px;
@@ -714,32 +721,49 @@ div[data-testid="stPlotlyChart"] {
 # 3. DATA INGESTION & ROBUST DATASET RESOLUTION
 # =========================================================
 APP_DIR = Path(__file__).resolve().parent
+REPO_DIR = APP_DIR.parent
+CWD_DIR = Path.cwd()
+
+# Support the actual GitHub layout without requiring the dataset to be copied
+# into v1/: repo/data/MPLAD_cleaned_v2.csv + repo/v1/app.py
 DATA_PATHS = [
-    # Deployed repo layout: repo/v1/app.py -> repo/data/MPLAD_cleaned_v2.csv
-    APP_DIR.parent / "data" / "MPLAD_cleaned_v2.csv",
-    # Other local layouts
+    REPO_DIR / "data" / "MPLAD_cleaned_v2.csv",
     APP_DIR / "data" / "MPLAD_cleaned_v2.csv",
+    CWD_DIR / "data" / "MPLAD_cleaned_v2.csv",
     APP_DIR / "MPLAD_cleaned_v2.csv",
-    Path.cwd() / "data" / "MPLAD_cleaned_v2.csv",
-    Path.cwd() / "MPLAD_cleaned_v2.csv",
+    CWD_DIR / "MPLAD_cleaned_v2.csv",
+    Path("C:/Users/prath/Desktop/workFlow/data/MPLAD_cleaned_v2.csv"),
+    Path("C:/Users/prath/Desktop/sih_mplads_risk_frontend_v4/sih_risk_frontend/MPLAD_cleaned_v2.csv"),
 ]
 
 @st.cache_data(show_spinner=False)
 def load_data(uploaded_file=None):
     if uploaded_file is not None:
-        return pd.read_csv(uploaded_file, low_memory=False), "Uploaded File"
-
-    # Try the repository/local paths first.
-    for path in DATA_PATHS:
         try:
-            if path.exists() and path.is_file():
-                df = pd.read_csv(path, low_memory=False)
-                if not df.empty:
-                    return df, str(path)
-        except Exception:
-            continue
+            return pd.read_csv(uploaded_file, low_memory=False), "Uploaded File"
+        except Exception as exc:
+            st.error(f"Unable to read the uploaded CSV: {exc}")
+            return None, None
 
-    # Final fallback for Streamlit Cloud.
+    seen = set()
+    read_errors = []
+    for path in DATA_PATHS:
+        path = path.resolve()
+        if path in seen:
+            continue
+        seen.add(path)
+        if not path.is_file():
+            continue
+        try:
+            frame = pd.read_csv(path, low_memory=False)
+            if frame.empty:
+                read_errors.append(f"{path}: file is empty")
+                continue
+            return frame, str(path)
+        except Exception as exc:
+            read_errors.append(f"{path}: {exc}")
+
+    # Streamlit Cloud fallback: fetch the repository dataset directly.
     try:
         import urllib.request
         import io
@@ -751,13 +775,16 @@ def load_data(uploaded_file=None):
         )
         with urllib.request.urlopen(github_url, timeout=30) as response:
             raw_data = response.read()
+        frame = pd.read_csv(io.BytesIO(raw_data), low_memory=False)
+        if not frame.empty:
+            return frame, "GitHub Repository Dataset"
+    except Exception as exc:
+        read_errors.append(f"GitHub dataset fallback: {exc}")
 
-        df = pd.read_csv(io.BytesIO(raw_data), low_memory=False)
-        if not df.empty:
-            return df, "GitHub Repository Dataset"
-    except Exception:
-        pass
-
+    # Return a useful diagnostic instead of hiding all failures behind
+    # the generic 'No dataset available' message.
+    if read_errors:
+        st.error("The dataset could not be loaded. " + read_errors[0])
     return None, None
 
 def find_col(df, candidates):
@@ -1363,7 +1390,11 @@ uploaded = st.sidebar.file_uploader(
 df, source = load_data(uploaded)
 
 if df is None:
-    st.error("No dataset available. Verify data/MPLAD_cleaned_v2.csv is placed in the project folder or upload a CSV via the sidebar.")
+    st.error(
+        "No dataset could be loaded. Expected the repository dataset at "
+        "data/MPLAD_cleaned_v2.csv relative to the repository root, "
+        "or a CSV uploaded through the sidebar."
+    )
     st.stop()
 
 df = prepare_data(df)
