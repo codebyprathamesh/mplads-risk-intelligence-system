@@ -68,6 +68,15 @@ html, body, [class*="css"] {
     color: var(--ink-primary) !important;
 }
 
+/* Streamlit Chrome Suppression */
+#MainMenu { visibility: hidden !important; display: none !important; }
+footer { visibility: hidden !important; display: none !important; }
+header[data-testid="stHeader"] { background: transparent !important; }
+div[data-testid="stToolbar"] { display: none !important; }
+div[data-testid="stDecoration"] { display: none !important; }
+div[data-testid="stStatusWidget"] { display: none !important; }
+.stDeployButton { display: none !important; }
+
 /* Main Container Layout */
 .block-container {
     padding-top: 2.2rem !important;
@@ -275,7 +284,7 @@ section[data-testid="stSidebar"] .sidebar-nav-active > button {
     padding-left: 9px !important;
 }
 
-/* Summary cards */
+/* Summary cards - UNIFIED MINIMAL BORDERS & COLORED NUMBERS */
 .ledger-summary-strip {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -323,16 +332,15 @@ section[data-testid="stSidebar"] .sidebar-nav-active > button {
     line-height: 1.35;
 }
 
-.ledger-cell.tone-critical { border-left: 4px solid var(--risk-critical); }
+/* Standardize borders to 1px hairline, apply colors ONLY to the values */
+.ledger-cell.tone-critical, .ledger-cell.tone-high, .ledger-cell.tone-medium, .ledger-cell.tone-low, .ledger-cell.tone-neutral {
+    border-left: 1px solid var(--hairline);
+}
 .ledger-cell.tone-critical .ledger-cell-val { color: var(--risk-critical); }
-.ledger-cell.tone-high { border-left: 4px solid var(--risk-high); }
 .ledger-cell.tone-high .ledger-cell-val { color: var(--risk-high); }
-.ledger-cell.tone-medium { border-left: 4px solid var(--risk-medium); }
 .ledger-cell.tone-medium .ledger-cell-val { color: var(--risk-medium); }
-.ledger-cell.tone-low { border-left: 4px solid var(--risk-low); }
 .ledger-cell.tone-low .ledger-cell-val { color: var(--risk-low); }
-.ledger-cell.tone-neutral { border-left: 4px solid var(--accent-teal-light); }
-.ledger-cell.tone-neutral .ledger-cell-val { color: var(--accent-teal); }
+.ledger-cell.tone-neutral .ledger-cell-val { color: var(--ink-primary); }
 
 @media (max-width: 1050px) {
     .ledger-summary-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -341,7 +349,7 @@ section[data-testid="stSidebar"] .sidebar-nav-active > button {
     .ledger-summary-strip { grid-template-columns: 1fr; }
 }
 
-/* Dashboard Flash Cards */
+/* Dashboard Flash Cards - EXACT SAME BEHAVIOR AS SUB-PAGES */
 .dashboard-cards {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -358,14 +366,19 @@ section[data-testid="stSidebar"] .sidebar-nav-active > button {
     box-sizing: border-box;
 }
 .dashboard-card:hover { border-color: #C8C4BA; }
+
 .dashboard-card.tone-neutral,
 .dashboard-card.tone-critical,
 .dashboard-card.tone-high,
-.dashboard-card.tone-medium { border-left: 1px solid var(--hairline); }
-.dashboard-card.tone-neutral .dashboard-card-value,
-.dashboard-card.tone-critical .dashboard-card-value,
-.dashboard-card.tone-high .dashboard-card-value,
-.dashboard-card.tone-medium .dashboard-card-value { color: var(--ink-primary); }
+.dashboard-card.tone-medium,
+.dashboard-card.tone-low { border-left: 1px solid var(--hairline); }
+
+.dashboard-card.tone-critical .dashboard-card-value { color: var(--risk-critical); }
+.dashboard-card.tone-high .dashboard-card-value { color: var(--risk-high); }
+.dashboard-card.tone-medium .dashboard-card-value { color: var(--risk-medium); }
+.dashboard-card.tone-low .dashboard-card-value { color: var(--risk-low); }
+.dashboard-card.tone-neutral .dashboard-card-value { color: var(--ink-primary); }
+
 .dashboard-card-kicker {
     font-family: 'Inter', sans-serif;
     font-size: 11px;
@@ -684,7 +697,6 @@ GITHUB_DATA_URL = (
     "main/data/MPLAD_cleaned_v2.csv"
 )
 
-# Cached robust loader preventing UploadedFile hash errors
 @st.cache_data(show_spinner=False)
 def _load_default_data():
     for path in DATA_PATHS:
@@ -1500,22 +1512,22 @@ elif page == "Risk Signals":
 <div class="ledger-summary-strip">
   <div class="ledger-cell tone-critical">
     <span class="ledger-cell-label">High & critical cohort</span>
-    <span class="ledger-cell-val" style="color:{RISK_COLORS['Critical']};">{high_risk_count:,}</span>
+    <span class="ledger-cell-val">{high_risk_count:,}</span>
     <span class="ledger-cell-sub">Requires direct inquiry</span>
   </div>
   <div class="ledger-cell tone-critical">
     <span class="ledger-cell-label">Machine learning anomalies</span>
-    <span class="ledger-cell-val" >{anomaly_count:,}</span>
+    <span class="ledger-cell-val">{anomaly_count:,}</span>
     <span class="ledger-cell-sub">Isolation Forest flags</span>
   </div>
   <div class="ledger-cell tone-medium">
     <span class="ledger-cell-label">Duplicate text signals</span>
-    <span class="ledger-cell-val" >{duplicate_count:,}</span>
+    <span class="ledger-cell-val">{duplicate_count:,}</span>
     <span class="ledger-cell-sub">Semantic match cluster</span>
   </div>
   <div class="ledger-cell tone-critical">
     <span class="ledger-cell-label">Completion overdue</span>
-    <span class="ledger-cell-val" >{int(filtered['Completion Overdue'].sum()):,}</span>
+    <span class="ledger-cell-val">{int(filtered['Completion Overdue'].sum()):,}</span>
     <span class="ledger-cell-sub">Beyond statutory timeline</span>
   </div>
 </div>
@@ -1613,17 +1625,17 @@ elif page == "Anomaly Center":
 <div class="ledger-summary-strip">
   <div class="ledger-cell tone-critical">
     <span class="ledger-cell-label">Detected statistical anomalies</span>
-    <span class="ledger-cell-val" >{anomaly_count:,}</span>
+    <span class="ledger-cell-val">{anomaly_count:,}</span>
     <span class="ledger-cell-sub">Multivariate outliers</span>
   </div>
   <div class="ledger-cell tone-medium">
     <span class="ledger-cell-label">Cohort anomaly rate</span>
-    <span class="ledger-cell-val" >{anomaly_rate:.2f}%</span>
+    <span class="ledger-cell-val">{anomaly_rate:.2f}%</span>
     <span class="ledger-cell-sub">Baseline contamination: 3.0%</span>
   </div>
   <div class="ledger-cell tone-critical">
     <span class="ledger-cell-label">High/critical anomaly overlap</span>
-    <span class="ledger-cell-val" >{high_crit_anomaly:,}</span>
+    <span class="ledger-cell-val">{high_crit_anomaly:,}</span>
     <span class="ledger-cell-sub">Dual-flagged priority cases</span>
   </div>
 </div>
@@ -1679,22 +1691,22 @@ elif page == "Cost Intelligence":
 <div class="ledger-summary-strip">
   <div class="ledger-cell tone-neutral">
     <span class="ledger-cell-label">Aggregate sanctioned</span>
-    <span class="ledger-cell-val" >{money(s_vals.sum())}</span>
+    <span class="ledger-cell-val">{money(s_vals.sum())}</span>
     <span class="ledger-cell-sub">National allocation</span>
   </div>
   <div class="ledger-cell tone-neutral">
     <span class="ledger-cell-label">Median allocation</span>
-    <span class="ledger-cell-val" >{money(p50)}</span>
+    <span class="ledger-cell-val">{money(p50)}</span>
     <span class="ledger-cell-sub">50th percentile</span>
   </div>
   <div class="ledger-cell tone-medium">
     <span class="ledger-cell-label">95th percentile threshold</span>
-    <span class="ledger-cell-val" >{money(p95)}</span>
+    <span class="ledger-cell-val">{money(p95)}</span>
     <span class="ledger-cell-sub">Outlier boundary</span>
   </div>
   <div class="ledger-cell tone-critical">
     <span class="ledger-cell-label">Cost overrun works</span>
-    <span class="ledger-cell-val" >{len(overrun_cases):,}</span>
+    <span class="ledger-cell-val">{len(overrun_cases):,}</span>
     <span class="ledger-cell-sub">Expenditure > sanction</span>
   </div>
 </div>
@@ -1855,22 +1867,22 @@ elif page == "Project Monitoring":
 <div class="ledger-summary-strip">
   <div class="ledger-cell tone-critical">
     <span class="ledger-cell-label">Completion overdue works</span>
-    <span class="ledger-cell-val" >{int(filtered['Completion Overdue'].sum()):,}</span>
+    <span class="ledger-cell-val">{int(filtered['Completion Overdue'].sum()):,}</span>
     <span class="ledger-cell-sub">Operating past stipulated date</span>
   </div>
   <div class="ledger-cell tone-medium">
     <span class="ledger-cell-label">Sanction overdue works</span>
-    <span class="ledger-cell-val" >{int(filtered['Sanction Overdue'].sum()):,}</span>
+    <span class="ledger-cell-val">{int(filtered['Sanction Overdue'].sum()):,}</span>
     <span class="ledger-cell-sub">Pending > 75 days</span>
   </div>
   <div class="ledger-cell tone-low">
     <span class="ledger-cell-label">Completed works</span>
-    <span class="ledger-cell-val" >{completed_count:,}</span>
+    <span class="ledger-cell-val">{completed_count:,}</span>
     <span class="ledger-cell-sub">Reported finished</span>
   </div>
   <div class="ledger-cell tone-low">
     <span class="ledger-cell-label">Completion rate</span>
-    <span class="ledger-cell-val" >{completion_rate:.1f}%</span>
+    <span class="ledger-cell-val">{completion_rate:.1f}%</span>
     <span class="ledger-cell-sub">Of active register</span>
   </div>
 </div>
@@ -2017,17 +2029,17 @@ elif page == "Similar Works":
 <div class="ledger-summary-strip">
   <div class="ledger-cell tone-medium">
     <span class="ledger-cell-label">Flagged duplicate records</span>
-    <span class="ledger-cell-val" >{len(dup_df):,}</span>
+    <span class="ledger-cell-val">{len(dup_df):,}</span>
     <span class="ledger-cell-sub">Semantic text overlap</span>
   </div>
-  <div class="ledger-cell">
+  <div class="ledger-cell tone-neutral">
     <span class="ledger-cell-label">Distinct MPs affected</span>
-    <span class="ledger-cell-val" >{s_mps:,}</span>
+    <span class="ledger-cell-val">{s_mps:,}</span>
     <span class="ledger-cell-sub">Parliamentary cohort</span>
   </div>
   <div class="ledger-cell tone-medium">
     <span class="ledger-cell-label">Duplication proportion</span>
-    <span class="ledger-cell-val" >{(len(dup_df) / len(filtered) * 100) if len(filtered) else 0:.2f}%</span>
+    <span class="ledger-cell-val">{(len(dup_df) / len(filtered) * 100) if len(filtered) else 0:.2f}%</span>
     <span class="ledger-cell-sub">Of active register</span>
   </div>
 </div>
