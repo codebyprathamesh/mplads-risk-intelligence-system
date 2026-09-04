@@ -235,84 +235,55 @@ div[data-testid="stDataFrame"] th {
     color: var(--ink-primary);
 }
 
-/* Sidebar: quiet navigation */
-/* Sidebar Radio Navigation: Robust Item Visibility & Contrast */
-section[data-testid="stSidebar"] [data-testid="stRadio"] > label {
+/* Sidebar: quiet, simple clickable navigation — no radio circles */
+section[data-testid="stSidebar"] .sidebar-nav-label {
     font-family: 'IBM Plex Mono', monospace !important;
     font-size: 13px !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
     color: var(--ink-secondary) !important;
-    margin-bottom: 8px !important;
+    margin: 0 0 8px 0 !important;
 }
 
-section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] {
-    gap: 0px !important;
-    border-top: 1px solid var(--hairline-light);
-}
-
-section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label {
-    background: transparent !important;
-    border: none !important;
-    border-bottom: 1px solid var(--hairline-light) !important;
-    border-radius: 0px !important;
-    padding: 10px 10px !important;
-    cursor: pointer !important;
+section[data-testid="stSidebar"] [data-testid="stButton"] {
     margin: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    transition: background-color 0.12s ease !important;
 }
 
-section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label:hover {
-    background: var(--paper-hover) !important;
-}
-
-section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label > div:first-of-type {
-    display: none !important;
-}
-section[data-testid="stSidebar"] [data-testid="stRadio"] input[type="radio"] {
-    display: none !important;
-    visibility: hidden !important;
-}
-section[data-testid="stSidebar"] [data-testid="stRadio"] label > div:first-child {
-    display: none !important;
-}
-
-section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label > div:last-of-type {
-    display: inline-block !important;
+section[data-testid="stSidebar"] [data-testid="stButton"] > button {
     width: 100% !important;
-}
-
-section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label div[data-testid="stMarkdownContainer"] {
-    display: block !important;
-    visibility: visible !important;
-}
-
-section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label p {
+    min-height: 42px !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    padding: 9px 12px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--hairline-light) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: var(--ink-secondary) !important;
     font-family: 'Inter', sans-serif !important;
     font-size: 14px !important;
-    color: var(--ink-secondary) !important;
-    margin: 0 !important;
-    display: block !important;
-    visibility: visible !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
 }
 
-section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label:has(input:checked) {
-    background: #E8E6DF !important;
-    border-left: 3px solid var(--ink-primary) !important;
-}
-
-section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label:has(input:checked) p {
+section[data-testid="stSidebar"] [data-testid="stButton"] > button:hover {
+    background: var(--paper-hover) !important;
     color: var(--ink-primary) !important;
-    font-weight: 600 !important;
+    border-color: var(--hairline-light) !important;
 }
 
-section[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label:has(input:checked) p::before {
-    content: "■ ";
-    font-size: 10px;
-    color: var(--ink-primary);
-    margin-right: 7px;
-    vertical-align: middle;
+section[data-testid="stSidebar"] [data-testid="stButton"] > button:focus,
+section[data-testid="stSidebar"] [data-testid="stButton"] > button:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+section[data-testid="stSidebar"] .sidebar-nav-active > button {
+    background: #E8E6DF !important;
+    color: var(--ink-primary) !important;
+    font-weight: 650 !important;
+    border-left: 3px solid var(--ink-primary) !important;
+    padding-left: 9px !important;
 }
 
 /* Summary cards used across operational pages */
@@ -721,70 +692,48 @@ div[data-testid="stPlotlyChart"] {
 # 3. DATA INGESTION & ROBUST DATASET RESOLUTION
 # =========================================================
 APP_DIR = Path(__file__).resolve().parent
-REPO_DIR = APP_DIR.parent
-CWD_DIR = Path.cwd()
-
-# Support the actual GitHub layout without requiring the dataset to be copied
-# into v1/: repo/data/MPLAD_cleaned_v2.csv + repo/v1/app.py
 DATA_PATHS = [
-    REPO_DIR / "data" / "MPLAD_cleaned_v2.csv",
+    # Deployed repository layout: repo/v1/app.py -> repo/data/MPLAD_cleaned_v2.csv
+    APP_DIR.parent / "data" / "MPLAD_cleaned_v2.csv",
+    # Other valid local layouts
     APP_DIR / "data" / "MPLAD_cleaned_v2.csv",
-    CWD_DIR / "data" / "MPLAD_cleaned_v2.csv",
     APP_DIR / "MPLAD_cleaned_v2.csv",
-    CWD_DIR / "MPLAD_cleaned_v2.csv",
-    Path("C:/Users/prath/Desktop/workFlow/data/MPLAD_cleaned_v2.csv"),
-    Path("C:/Users/prath/Desktop/sih_mplads_risk_frontend_v4/sih_risk_frontend/MPLAD_cleaned_v2.csv"),
+    Path.cwd() / "data" / "MPLAD_cleaned_v2.csv",
+    Path.cwd() / "MPLAD_cleaned_v2.csv",
 ]
+
+GITHUB_DATA_URL = (
+    "https://raw.githubusercontent.com/"
+    "codebyprathamesh/mplads-risk-intelligence-system/"
+    "main/data/MPLAD_cleaned_v2.csv"
+)
 
 @st.cache_data(show_spinner=False)
 def load_data(uploaded_file=None):
     if uploaded_file is not None:
-        try:
-            return pd.read_csv(uploaded_file, low_memory=False), "Uploaded File"
-        except Exception as exc:
-            st.error(f"Unable to read the uploaded CSV: {exc}")
-            return None, None
+        return pd.read_csv(uploaded_file, low_memory=False), "Uploaded File"
 
-    seen = set()
-    read_errors = []
     for path in DATA_PATHS:
-        path = path.resolve()
-        if path in seen:
-            continue
-        seen.add(path)
-        if not path.is_file():
-            continue
         try:
-            frame = pd.read_csv(path, low_memory=False)
-            if frame.empty:
-                read_errors.append(f"{path}: file is empty")
-                continue
-            return frame, str(path)
-        except Exception as exc:
-            read_errors.append(f"{path}: {exc}")
+            if path.exists() and path.is_file():
+                df = pd.read_csv(path, low_memory=False)
+                if not df.empty:
+                    return df, str(path)
+        except Exception:
+            continue
 
-    # Streamlit Cloud fallback: fetch the repository dataset directly.
+    # Final fallback for Streamlit Cloud.
     try:
         import urllib.request
         import io
-
-        github_url = (
-            "https://raw.githubusercontent.com/"
-            "codebyprathamesh/mplads-risk-intelligence-system/"
-            "main/data/MPLAD_cleaned_v2.csv"
-        )
-        with urllib.request.urlopen(github_url, timeout=30) as response:
+        with urllib.request.urlopen(GITHUB_DATA_URL, timeout=30) as response:
             raw_data = response.read()
-        frame = pd.read_csv(io.BytesIO(raw_data), low_memory=False)
-        if not frame.empty:
-            return frame, "GitHub Repository Dataset"
-    except Exception as exc:
-        read_errors.append(f"GitHub dataset fallback: {exc}")
+        df = pd.read_csv(io.BytesIO(raw_data), low_memory=False)
+        if not df.empty:
+            return df, "GitHub Repository Dataset"
+    except Exception:
+        pass
 
-    # Return a useful diagnostic instead of hiding all failures behind
-    # the generic 'No dataset available' message.
-    if read_errors:
-        st.error("The dataset could not be loaded. " + read_errors[0])
     return None, None
 
 def find_col(df, candidates):
@@ -1390,29 +1339,35 @@ uploaded = st.sidebar.file_uploader(
 df, source = load_data(uploaded)
 
 if df is None:
-    st.error(
-        "No dataset could be loaded. Expected the repository dataset at "
-        "data/MPLAD_cleaned_v2.csv relative to the repository root, "
-        "or a CSV uploaded through the sidebar."
-    )
+    st.error("No dataset available. Expected data/MPLAD_cleaned_v2.csv in the repository, or a CSV uploaded through the sidebar.")
     st.stop()
 
 df = prepare_data(df)
 
-# Navigation Index List
-page = st.sidebar.radio(
-    "",
-    [
-        "Dashboard",
-        "Risk Signals",
-        "Anomaly Center",
-        "Cost Intelligence",
-        "Project Monitoring",
-        "Works Explorer",
-        "Similar Works",
-    ],
-    index=0,
+# Navigation Index List — simple clickable buttons, no radio controls.
+NAV_ITEMS = [
+    "Dashboard",
+    "Risk Signals",
+    "Anomaly Center",
+    "Cost Intelligence",
+    "Project Monitoring",
+    "Works Explorer",
+    "Similar Works",
+]
+
+if "page" not in st.session_state or st.session_state.page not in NAV_ITEMS:
+    st.session_state.page = "Dashboard"
+
+st.sidebar.markdown(
+    "<div class='sidebar-nav-label'>Navigation</div>",
+    unsafe_allow_html=True,
 )
+for nav_item in NAV_ITEMS:
+    if st.sidebar.button(nav_item, key=f"nav_{nav_item.lower().replace(' ', '_')}", width="stretch"):
+        st.session_state.page = nav_item
+        st.rerun()
+
+page = st.session_state.page
 
 st.sidebar.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
 st.sidebar.markdown(
