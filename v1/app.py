@@ -73,7 +73,7 @@ html, body, [class*="css"] {
 /* Streamlit Chrome Suppression */
 #MainMenu { visibility: hidden !important; display: none !important; }
 footer { visibility: hidden !important; display: none !important; }
-header[data-testid="stHeader"] { display: none !important; height: 0px !important; }
+header[data-testid="stHeader"] { background: transparent !important; }
 div[data-testid="stToolbar"] { display: none !important; }
 div[data-testid="stDecoration"] { display: none !important; }
 div[data-testid="stStatusWidget"] { display: none !important; }
@@ -192,7 +192,7 @@ div[data-testid="stDataFrame"] th {
     color: var(--ink-primary);
 }
 
-/* Horizontal Stacked Risk Bar Component — No card wrapper, bare bar + single legend row */
+/* Horizontal Stacked Risk Bar Component */
 .stacked-risk-bar {
     display: flex;
     width: 100%;
@@ -235,7 +235,7 @@ div[data-testid="stDataFrame"] th {
     color: var(--ink-primary);
 }
 
-/* Sidebar: quiet, simple clickable navigation — no radio circles */
+/* Sidebar */
 section[data-testid="stSidebar"] .sidebar-nav-label {
     font-family: 'IBM Plex Mono', monospace !important;
     font-size: 13px !important;
@@ -286,7 +286,7 @@ section[data-testid="stSidebar"] .sidebar-nav-active > button {
     padding-left: 9px !important;
 }
 
-/* Summary cards used across operational pages */
+/* Summary cards */
 .ledger-summary-strip {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -352,8 +352,7 @@ section[data-testid="stSidebar"] .sidebar-nav-active > button {
     .ledger-summary-strip { grid-template-columns: 1fr; }
 }
 
-
-/* Dashboard Flash Cards — quiet hierarchy, minimal ornament */
+/* Dashboard Flash Cards */
 .dashboard-cards {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -403,19 +402,11 @@ section[data-testid="stSidebar"] .sidebar-nav-active > button {
     line-height: 1.4;
 }
 
-/* Plotly content sits on the page itself; section headings provide the hierarchy. */
-div[data-testid="stPlotlyChart"] {
-    background: transparent;
-    border: 0;
-    border-radius: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 @media (max-width: 900px) {
     .dashboard-cards { grid-template-columns: 1fr; }
 }
 
-/* Graph presentation: clean containers without artificial 'AI dashboard' decoration */
+/* Graph presentation */
 div[data-testid="stPlotlyChart"] {
     background: var(--paper-card);
     border: 1px solid var(--hairline);
@@ -424,9 +415,7 @@ div[data-testid="stPlotlyChart"] {
     box-sizing: border-box;
 }
 
-/* Sidebar Telemetry Block */
-
-/* Tables: Hairline borders, sharp 0px corners, no shadows */
+/* Tables */
 [data-testid="stDataFrame"] {
     border: 1px solid var(--hairline) !important;
     border-radius: 0px !important;
@@ -434,7 +423,7 @@ div[data-testid="stPlotlyChart"] {
     background: var(--paper-card) !important;
 }
 
-/* Native Metrics Overrides */
+/* Native Metrics */
 [data-testid="stMetric"] {
     border: 1px solid var(--hairline) !important;
     border-radius: 0px !important;
@@ -457,7 +446,7 @@ div[data-testid="stPlotlyChart"] {
     color: var(--ink-primary) !important;
 }
 
-/* Filters & Inputs: High Contrast Labels & Clean Type */
+/* Filters & Inputs */
 .stSelectbox label, .stMultiSelect label, .stTextInput label {
     font-family: 'IBM Plex Mono', monospace !important;
     font-size: 13.5px !important;
@@ -693,9 +682,7 @@ div[data-testid="stPlotlyChart"] {
 # =========================================================
 APP_DIR = Path(__file__).resolve().parent
 DATA_PATHS = [
-    # Deployed repository layout: repo/v1/app.py -> repo/data/MPLAD_cleaned_v2.csv
     APP_DIR.parent / "data" / "MPLAD_cleaned_v2.csv",
-    # Other valid local layouts
     APP_DIR / "data" / "MPLAD_cleaned_v2.csv",
     APP_DIR / "MPLAD_cleaned_v2.csv",
     Path.cwd() / "data" / "MPLAD_cleaned_v2.csv",
@@ -722,7 +709,6 @@ def load_data(uploaded_file=None):
         except Exception:
             continue
 
-    # Final fallback for Streamlit Cloud.
     try:
         import urllib.request
         import io
@@ -773,7 +759,6 @@ def render_page_header(title, description, meta_pairs, callout=None):
 def prepare_data(df):
     df = df.copy()
 
-    # Standardized friendly aliases
     aliases = {
         "Work ID": ["work_id", "Work ID", "ID", "id"],
         "State": ["state_name", "State", "state", "State Name"],
@@ -797,7 +782,6 @@ def prepare_data(df):
     else:
         df["Work Stage"] = df["Work Stage"].fillna("Not Reported").astype(str).str.strip()
 
-    # Financial conversions
     for col in df.columns:
         low = col.lower()
         if any(x in low for x in ["amount", "cost", "expenditure", "expense", "fund", "value", "payment"]):
@@ -812,7 +796,6 @@ def prepare_data(df):
                 if converted.notna().mean() > 0.5:
                     df[col] = converted
 
-    # Financial Year synthesis
     if "Financial Year" not in df.columns:
         fy_series = None
         if "letter_no" in df.columns:
@@ -839,7 +822,6 @@ def prepare_data(df):
         else:
             df["Financial Year"] = "Not Specified"
 
-    # Category normalization
     category_col = find_col(df, ["simple_category", "Work Category", "work_category", "Category", "category"])
     description_col = find_col(df, ["Work Description", "work_description", "Description", "description"])
 
@@ -863,7 +845,6 @@ def prepare_data(df):
     else:
         df["Display Category"] = "Other"
 
-    # Risk fields
     risk_col = find_col(df, ["Risk Score", "risk_score", "RiskScore"])
     tier_col = find_col(df, ["Risk Tier", "risk_tier", "RiskTier"])
     reason_col = find_col(df, ["Risk Reasons", "risk_reasons", "Risk Reason", "risk_reason"])
@@ -899,7 +880,6 @@ def prepare_data(df):
     else:
         df["Anomaly"] = False
 
-    # Normalize boolean ML signals
     for target, candidates in {
         "Sanction Overdue": ["sanction_overdue", "Sanction Overdue"],
         "Completion Overdue": ["completion_overdue", "Completion Overdue"],
@@ -924,24 +904,20 @@ def prepare_data(df):
 PAPER_BG = "#FAFAF7"
 PLOT_BG = "#FAFAF7"
 INK_PRIMARY = "#1A1A1A"
-INK_SECONDARY = "#4A4F58"  # High-contrast readable dark gray floor
+INK_SECONDARY = "#4A4F58"
 GRID_COLOR = "#DDDAD2"
 
-# Strict Risk Colors (Applied ONLY to risk-tier data)
 RISK_COLORS = {
-    "Critical": "#8B2E22",  # Deep brick red
-    "High": "#B0522D",      # Burnt orange
-    "Medium": "#9C6B2E",    # Muted amber
-    "Low": "#4B7A5E",       # Muted green
-    "No Risk": "#6B7280",   # Neutral gray
+    "Critical": "#8B2E22",
+    "High": "#B0522D",
+    "Medium": "#9C6B2E",
+    "Low": "#4B7A5E",
+    "No Risk": "#6B7280",
 }
 
-# Non-Risk Categorical Color Family (Muted deep teal)
 TEAL_BASE = "#2B6B6B"
 TEAL_LIGHT = "#6B9C9C"
-
-# Regulatory signals get their own accent (distinct from both risk tiers and categorical palette)
-SIGNAL_ACCENT = "#8A7355"  # warm taupe — risk-adjacent but not a risk tier color
+SIGNAL_ACCENT = "#8A7355"
 
 def style_fig(fig, height=380):
     fig.update_layout(
@@ -1200,7 +1176,6 @@ def india_risk_map(df):
         + "High risk share: <b>%{customdata[3]:.1f}%</b><extra></extra>"
     )
 
-    # Use Plotly's built-in geographic layer so the dashboard never depends on a Mapbox token.
     share_max = max(float(g["HighRiskShare"].max()), 1.0)
     fig = px.scatter_geo(
         g,
@@ -1344,7 +1319,7 @@ if df is None:
 
 df = prepare_data(df)
 
-# Navigation Index List — simple clickable buttons, no radio controls.
+# Navigation Index List
 NAV_ITEMS = [
     "Dashboard",
     "Risk Signals",
@@ -1363,7 +1338,7 @@ st.sidebar.markdown(
     unsafe_allow_html=True,
 )
 for nav_item in NAV_ITEMS:
-    if st.sidebar.button(nav_item, key=f"nav_{nav_item.lower().replace(' ', '_')}", width="stretch"):
+    if st.sidebar.button(nav_item, key=f"nav_{nav_item.lower().replace(' ', '_')}", use_container_width=True):
         st.session_state.page = nav_item
         st.rerun()
 
@@ -1406,7 +1381,7 @@ if fy_col:
     if selected_years:
         filtered = filtered[filtered[fy_col].astype(str).isin(selected_years)]
 
-if st.sidebar.button("Reset scope filters", width="stretch"):
+if st.sidebar.button("Reset scope filters", use_container_width=True):
     st.rerun()
 
 filter_ratio = (len(filtered) / len(df) * 100) if len(df) else 100.0
@@ -1417,7 +1392,6 @@ high_risk_count = int(filtered["Risk Tier"].isin(["High", "Critical"]).sum())
 critical_count = int((filtered["Risk Tier"] == "Critical").sum())
 anomaly_count = int(filtered["Anomaly"].sum())
 duplicate_count = int(filtered["Possible Duplicate"].sum())
-
 
 sanction_col = find_col(filtered, ["Sanction Amount", "sanction_amount", "Sanctioned Amount", "Recommended Amount", "recommended_amount"])
 expenditure_col = find_col(filtered, ["Actual Amount", "actual_amount", "Expenditure", "expenditure", "Actual Expenditure", "actual_expenditure"])
@@ -1530,7 +1504,6 @@ elif page == "Risk Signals":
         ],
     )
 
-    # Summary Strip
     st.markdown(
         f"""
 <div class="ledger-summary-strip">
@@ -1563,7 +1536,6 @@ elif page == "Risk Signals":
     if PLOTLY_OK:
         st.plotly_chart(risk_signal_chart(filtered), width="stretch", config={"displayModeBar": False})
 
-    # Audit Signal Register (Plain Ledger Table)
     st.markdown("<div class='section-head'>Regulatory signal breakdown register</div>", unsafe_allow_html=True)
 
     signal_definitions = [
@@ -1603,7 +1575,6 @@ elif page == "Risk Signals":
     )
     st.markdown(signals_html, unsafe_allow_html=True)
 
-    # Priority Inspection Queue
     st.markdown("<div class='section-head'>Priority inspection queue</div>", unsafe_allow_html=True)
 
     priority_queue = filtered[filtered["Risk Tier"].isin(["Critical", "High"])].sort_values(
@@ -1740,7 +1711,6 @@ elif page == "Cost Intelligence":
             unsafe_allow_html=True,
         )
 
-    # Cost Intelligence Density-Calibrated Scatter Plot
     if sanction_col and expenditure_col and PLOTLY_OK:
         comp = filtered[[sanction_col, expenditure_col, "Cost Overrun", "Work ID"]].apply(
             lambda x: pd.to_numeric(x, errors="coerce") if x.name in [sanction_col, expenditure_col] else x
@@ -1781,12 +1751,10 @@ elif page == "Cost Intelligence":
             if len(plot_data) > 4000:
                 plot_data = plot_data.sample(4000, random_state=42)
 
-            # Unified color rule: Non-risk points in TEAL_BASE (#2B6B6B), overrun in RISK_COLORS['High'] (#B0522D)
             point_colors = np.where(plot_data["Cost Overrun"], RISK_COLORS["High"], TEAL_BASE)
 
             fig_scatter = go.Figure()
 
-            # 45-degree parity reference line
             if not is_log and max_x is not None:
                 fig_scatter.add_trace(
                     go.Scatter(
@@ -1831,7 +1799,6 @@ elif page == "Cost Intelligence":
 
             st.plotly_chart(fig_scatter, width="stretch", config={"displayModeBar": False})
 
-    # Cost Overrun Register Table
     overrun_df = filtered[filtered["Cost Overrun"]].sort_values("Risk Score", ascending=False).copy()
     st.markdown("<div class='section-head'>Cost overrun register</div>", unsafe_allow_html=True)
 
@@ -2002,7 +1969,6 @@ elif page == "Works Explorer":
 
         rec = explorer_view.loc[selected_idx]
 
-        # Distinctive 0-100 Horizontal Tick Scale Display
         render_risk_tick_scale(
             score=rec["Risk Score"],
             tier=rec["Risk Tier"],
@@ -2014,7 +1980,6 @@ elif page == "Works Explorer":
         actual_val = money(rec.get("Actual Amount", 0))
         letter_no = rec.get("Letter No", rec.get("letter_no", "N/A"))
 
-        # Formal Case-File Sheet Layout
         st.markdown(
             f"""
 <div class="casefile-sheet">
@@ -2110,5 +2075,3 @@ elif page == "Similar Works":
 """,
             unsafe_allow_html=True,
         )
-
-
