@@ -1,4 +1,0 @@
-GitHub source:
-https://github.com/codebyprathamesh/mplads-risk-intelligence/blob/main/notebooks/RiskIntelligence_v2.ipynb
-
-The repository's notebooks/ directory currently contains one notebook: RiskIntelligence_v2.ipynb.
